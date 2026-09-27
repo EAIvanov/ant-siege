@@ -1,13 +1,13 @@
 // Точка входа: интерфейс, настройки, полный экран, игровой цикл
-import { T, ANTS } from './config.js?v=785a1ab2';
-import { sfx } from './audio.js?v=785a1ab2';
-import { G, head, view, input, flags, resetGame, score } from './state.js?v=785a1ab2';
-import { loadVision, initCamera, visionReady, fitView, track, light } from './tracking.js?v=785a1ab2';
-import { step, stepParticles, stepFeel, hooks, chargeLevel, waveCountdown, comboMult } from './game.js?v=785a1ab2';
-import { initCalib, openCalib, updateCalib, loadCalib, isCalibrated } from './calib.js?v=785a1ab2';
-import { initRenderer, resizeRenderer, render, atlasReady } from './render.js?v=785a1ab2';
-import { mic, initMic, sampleMic } from './mic.js?v=785a1ab2';
-import { resetShots, requestShot, captureDue, shots, downloadShot, downloadAll } from './shots.js?v=785a1ab2';
+import { T, ANTS } from './config.js?v=7ea3fdf3';
+import { sfx } from './audio.js?v=7ea3fdf3';
+import { G, head, view, input, flags, resetGame, score } from './state.js?v=7ea3fdf3';
+import { loadVision, initCamera, visionReady, fitView, track, light } from './tracking.js?v=7ea3fdf3';
+import { step, stepParticles, stepFeel, hooks, chargeLevel, waveCountdown, comboMult } from './game.js?v=7ea3fdf3';
+import { initCalib, openCalib, updateCalib, loadCalib, isCalibrated } from './calib.js?v=7ea3fdf3';
+import { initRenderer, resizeRenderer, render, atlasReady } from './render.js?v=7ea3fdf3';
+import { mic, initMic, sampleMic } from './mic.js?v=7ea3fdf3';
+import { resetShots, requestShot, captureDue, shots, downloadShot, downloadAll } from './shots.js?v=7ea3fdf3';
 
 const $ = s => document.querySelector(s);
 const video = $('#cam'), canvas = $('#game');

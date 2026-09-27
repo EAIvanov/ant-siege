@@ -1,9 +1,9 @@
 // Камера и MediaPipe: лицо (позиция, тряска, глаза) и руки (точки, скорость ладони)
 // MediaPipe 1.0.1 — локальная копия (tools/vendor.py): с чужих серверов ничего не грузится, статистика в Google отключена
 import { FilesetResolver, FaceLandmarker, HandLandmarker } from "../vendor/mediapipe/vision_bundle.mjs";
-import { T } from './config.js?v=785a1ab2';
-import { clamp, dist, avg } from './util.js?v=785a1ab2';
-import { view, head, input } from './state.js?v=785a1ab2';
+import { T } from './config.js?v=7ea3fdf3';
+import { clamp, dist, avg } from './util.js?v=7ea3fdf3';
+import { view, head, input } from './state.js?v=7ea3fdf3';
 
 // полные адреса от этого модуля (относительный путь MediaPipe понял бы от страницы)
 const WASM = new URL("../vendor/mediapipe/wasm", import.meta.url).href;
@@ -241,7 +241,8 @@ function updateFist(prev, h, dt) {
   // Расслабленная рука (пальцы чуть согнуты, кончики рядом) похожа на неплотный кулак или щепоть — порогами
   // их не развести, а без раскрытия перед сжатием она огонь не зажжёт. Так же и рука, вошедшая в кадр согнутой
   if (!prev && !(h.sinceOpen <= T.armTime)) return null;
-  const f = prev ? { ...prev } : { vPeak: 0, aim: { vx: 0, vy: 0 }, charge: 0, pos: h.palm, age: 0 };
+  // born — когда сжатие началось (калибровка засчитывает только жест, сделанный на её шаге)
+  const f = prev ? { ...prev } : { vPeak: 0, aim: { vx: 0, vy: 0 }, charge: 0, pos: h.palm, age: 0, born: performance.now() };
   // сколько рука сжата непрерывно и спокойно: на резком взмахе кадр смазан, и MediaPipe может на миг
   // «сжать» пальцы — такое сжатие огонь не начинает (начатый заряд взмах не сбрасывает)
   if (Math.hypot(h.vx, h.vy) < T.closeCalm || f.charge > 0) f.age += dt;

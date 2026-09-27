@@ -6,9 +6,9 @@ import { EffectComposer } from 'three/addons/postprocessing/EffectComposer.js';
 import { RenderPass } from 'three/addons/postprocessing/RenderPass.js';
 import { UnrealBloomPass } from 'three/addons/postprocessing/UnrealBloomPass.js';
 import { OutputPass } from 'three/addons/postprocessing/OutputPass.js';
-import { T, PAL, ANTS } from './config.js?v=785a1ab2';
-import { rand } from './util.js?v=785a1ab2';
-import { G, head, input, view, flags } from './state.js?v=785a1ab2';
+import { T, PAL, ANTS } from './config.js?v=7ea3fdf3';
+import { rand } from './util.js?v=7ea3fdf3';
+import { G, head, input, view, flags } from './state.js?v=7ea3fdf3';
 
 let renderer, composer, camera, videoMesh, normal, glow, top, atlasTex;
 export let atlasReady = Promise.resolve(); // иконки бонусов дорисованы в атлас (SVG грузятся асинхронно)
@@ -537,7 +537,8 @@ export function render() {
   // руки: кольцо ладони (розовое на взмахе), зоны пальцев
   for (const h of input.hands) {
     const fast = Math.hypot(h.vx, h.vy) > T.flingSpeed, pr = h.r * 1.15 * RING;
-    glow.add('ring', h.palm.x, h.palm.y, pr, pr, 0, fast ? PAL.pink : PAL.lav, fast ? 0.9 : 0.12);
+    const calOk = flags.calib && flags.calibOk; // калибровка: поза засчитана
+    glow.add('ring', h.palm.x, h.palm.y, pr, pr, 0, calOk ? PAL.cyan : fast ? PAL.pink : PAL.lav, calOk || fast ? 0.9 : flags.calib ? 0.4 : 0.12);
     if (fast) {
       const tx = h.palm.x - h.vx * 0.08, ty = h.palm.y - h.vy * 0.08, len = Math.hypot(h.vx, h.vy) * 0.08;
       glow.add('glow', (h.palm.x + tx) / 2, (h.palm.y + ty) / 2, len + 30, 30, Math.atan2(h.vy, h.vx), PAL.pink, 0.55);

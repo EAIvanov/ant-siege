@@ -1,5 +1,5 @@
 // Общее изменяемое состояние. Модули — синглтоны, так что все видят одни и те же объекты.
-import { rand } from './util.js?v=785a1ab2';
+import { rand } from './util.js?v=7ea3fdf3';
 
 // экран и пересчёт координат камеры
 export const view = { W: 0, H: 0, vw: 0, vh: 0, scale: 1, offX: 0, offY: 0 };
@@ -19,7 +19,8 @@ export const head = {
 export const input = { hands: [], prevHands: [], fires: [] };
 
 // calib — идёт калибровка: трекинг есть, игры нет; paused — лица нет в кадре, мир стоит
-export const flags = { running: false, over: false, calib: false, paused: false };
+// calibOk — при калибровке нужное действие сейчас распознано (кольцо ладони на видео голубое)
+export const flags = { running: false, over: false, calib: false, paused: false, calibOk: false };
 
 export const G = {}; // игровая сессия
 export function resetGame() {

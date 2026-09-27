@@ -112,7 +112,10 @@ ul ul{margin:4px 0 0;padding-left:16px}
 .cal-top{display:flex;justify-content:space-between;align-items:baseline;gap:10px}
 .cal-top h2{margin:0 0 8px;font-size:18px}
 #calStepN{color:var(--mute);font-variant-numeric:tabular-nums}
-#calText{font:700 20px/1.3 Rubik,system-ui,sans-serif;color:var(--ink);margin-bottom:10px;min-height:1.3em}
+#calText{font:700 20px/1.3 Rubik,system-ui,sans-serif;color:var(--ink);margin-bottom:4px;min-height:1.3em}
+/* живая подсказка: что игра видит прямо сейчас; зелёная — действие распознано */
+#calHint{font:600 14px/1.4 Rubik,system-ui,sans-serif;color:var(--amber);margin-bottom:10px;min-height:1.4em}
+#calHint.ok{color:#5fe39a}
 .cal-bar{height:6px;border-radius:3px;background:rgba(10,5,30,.6);border:1px solid rgba(177,140,255,.35);overflow:hidden;margin-bottom:12px}
 .cal-bar i{display:block;height:100%;background:linear-gradient(90deg,#7b4dff,#ff6bd5);transform-origin:left;transform:scaleX(0)}
 #calRes{font-size:13px;margin-bottom:12px}

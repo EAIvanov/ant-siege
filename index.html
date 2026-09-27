@@ -4,9 +4,9 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <title>Муравьиная осада</title>
-<link rel="stylesheet" href="css/fonts.css?v=785a1ab2">
-<link rel="stylesheet" href="css/style.css?v=785a1ab2">
-<link rel="stylesheet" href="css/icons.css?v=785a1ab2">
+<link rel="stylesheet" href="css/fonts.css?v=7ea3fdf3">
+<link rel="stylesheet" href="css/style.css?v=7ea3fdf3">
+<link rel="stylesheet" href="css/icons.css?v=7ea3fdf3">
 <script type="importmap">
 {
   "imports": {
@@ -98,11 +98,13 @@
   <div class="card calib">
     <div class="cal-top"><h2>Калибровка</h2><span id="calStepN"></span></div>
     <p id="calText"></p>
+    <p id="calHint" aria-live="polite"></p>
     <div class="cal-bar"><i id="calBar"></i></div>
     <ul id="calRes" hidden></ul>
     <div class="cal-actions">
       <button class="ghost" id="calAgain" hidden>Повторить</button>
       <button class="ghost" id="calReset" hidden>Сбросить</button>
+      <button class="ghost" id="calSkip" hidden>Пропустить шаг</button>
       <button id="calDone">Отмена</button>
     </div>
   </div>
@@ -142,6 +144,6 @@
     e.style.display = 'block'; e.textContent = 'Ошибка: ' + (ev.message || ev.error || ev);
   });
 </script>
-<script type="module" src="js/main.js?v=785a1ab2" onerror="bootFail()"></script>
+<script type="module" src="js/main.js?v=7ea3fdf3" onerror="bootFail()"></script>
 </body>
 </html>
