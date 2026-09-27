@@ -155,3 +155,8 @@ button.ghost{background:transparent;border:1px solid rgba(177,140,255,.6);color:
   font:400 13px/1.4 Rubik,system-ui,sans-serif;letter-spacing:0;color:var(--ink);text-wrap:balance;
   opacity:0;transform:translateY(4px);pointer-events:none;transition:opacity .15s,transform .15s}
 #studio:hover #studioTip,#studio:focus-visible #studioTip{opacity:1;transform:none}
+/* узкий экран: карточка почти во всю ширину — плашка сворачивается в значок, чтобы не закрывать кнопки */
+@media (max-width:900px){
+  #studio{min-width:0;width:36px;padding:0}
+  #studio .studio-name{position:absolute;width:1px;height:1px;overflow:hidden;clip-path:inset(50%)}
+}
