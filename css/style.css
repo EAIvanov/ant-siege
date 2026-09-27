@@ -103,7 +103,7 @@ ul ul{margin:4px 0 0;padding-left:16px}
 #combo .track i{display:block;height:100%;background:var(--magic);transform-origin:left}
 #combo.t1 b{color:var(--magic)} #combo.t2 b{color:var(--pink)} #combo.t3 b{color:var(--amber)}
 #combo.t3{border-color:var(--amber);box-shadow:0 0 12px rgba(255,180,50,.5)}
-.chip.lull{color:var(--magic-hi)}
+.chip.lull{color:var(--magic-hi)} .chip.nomic{color:var(--amber)}
 
 /* калибровка: экран без затемнения, карточка сверху — под ней видно себя и руки */
 .screen.lite{background:none;backdrop-filter:none;place-items:start center}

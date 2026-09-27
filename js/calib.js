@@ -1,9 +1,9 @@
 // Калибровка под игрока: раскрытая ладонь, кулак, тишина, крик. По замерам переставляет пороги
 // кулака, крика и открытого рта в T и запоминает их в браузере. Остальной код читает T как обычно.
-import { T } from './config.js?v=f511fb61';
-import { input, head } from './state.js?v=f511fb61';
-import { mic } from './mic.js?v=f511fb61';
-import { sfx } from './audio.js?v=f511fb61';
+import { T } from './config.js?v=785a1ab2';
+import { input, head } from './state.js?v=785a1ab2';
+import { mic } from './mic.js?v=785a1ab2';
+import { sfx } from './audio.js?v=785a1ab2';
 
 const KEY = 'antsiege_calib';
 const KEYS = ['fist3', 'screamLevel', 'screamLevelMouth', 'jawOpen', 'jawScream'];

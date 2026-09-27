@@ -1,13 +1,13 @@
 // Точка входа: интерфейс, настройки, полный экран, игровой цикл
-import { T, ANTS } from './config.js?v=f511fb61';
-import { sfx } from './audio.js?v=f511fb61';
-import { G, head, view, input, flags, resetGame, score } from './state.js?v=f511fb61';
-import { loadVision, initCamera, visionReady, fitView, track, light } from './tracking.js?v=f511fb61';
-import { step, stepParticles, stepFeel, hooks, chargeLevel, waveCountdown, comboMult } from './game.js?v=f511fb61';
-import { initCalib, openCalib, updateCalib, loadCalib, isCalibrated } from './calib.js?v=f511fb61';
-import { initRenderer, resizeRenderer, render, atlasReady } from './render.js?v=f511fb61';
-import { mic, initMic, sampleMic } from './mic.js?v=f511fb61';
-import { resetShots, requestShot, captureDue, shots, downloadShot, downloadAll } from './shots.js?v=f511fb61';
+import { T, ANTS } from './config.js?v=785a1ab2';
+import { sfx } from './audio.js?v=785a1ab2';
+import { G, head, view, input, flags, resetGame, score } from './state.js?v=785a1ab2';
+import { loadVision, initCamera, visionReady, fitView, track, light } from './tracking.js?v=785a1ab2';
+import { step, stepParticles, stepFeel, hooks, chargeLevel, waveCountdown, comboMult } from './game.js?v=785a1ab2';
+import { initCalib, openCalib, updateCalib, loadCalib, isCalibrated } from './calib.js?v=785a1ab2';
+import { initRenderer, resizeRenderer, render, atlasReady } from './render.js?v=785a1ab2';
+import { mic, initMic, sampleMic } from './mic.js?v=785a1ab2';
+import { resetShots, requestShot, captureDue, shots, downloadShot, downloadAll } from './shots.js?v=785a1ab2';
 
 const $ = s => document.querySelector(s);
 const video = $('#cam'), canvas = $('#game');
@@ -180,7 +180,8 @@ function frame(now) {
     track(video, now);
     sampleMic();
     // лица нет — пауза: иначе можно спрятать лицо, и муравьям не во что вцепиться
-    flags.paused = flags.running && !flags.over && !flags.calib && head.lostFor > T.pauseAfter;
+    // пока идёт крик, не паузим: голова запрокидывается, лицо теряется на миг, а заряд крика замер бы
+    flags.paused = flags.running && !flags.over && !flags.calib && head.lostFor > T.pauseAfter && !(G.screamT > 0);
     warnings();
   }
   if (flags.calib) { updateCalib(dt); stepParticles(dt); }
@@ -268,6 +269,8 @@ function hud(att) {
   ui.att.textContent = att; ui.wave.textContent = G.wave;
   const chips = ['lull', 'slow', 'shield', 'fear'].filter(k => G.fx[k] > 0)
     .map(k => `<span class="chip ${k}">${{ lull: 'передышка', slow: 'медленно', shield: 'бессмертие', fear: 'паника' }[k]} ${G.fx[k].toFixed(1)}</span>`);
+  // без микрофона крик — только по широко открытому рту: игрок должен это видеть, а не гадать
+  if (!mic.ok && mic.fake == null) chips.push('<span class="chip nomic">без микрофона: крик по открытому рту</span>');
   ui.fx.innerHTML = chips.join(' ');
   // серия: видна с 3 подряд; полоска — сколько осталось до обрыва
   ui.combo.hidden = G.combo < 3;

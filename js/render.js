@@ -6,9 +6,9 @@ import { EffectComposer } from 'three/addons/postprocessing/EffectComposer.js';
 import { RenderPass } from 'three/addons/postprocessing/RenderPass.js';
 import { UnrealBloomPass } from 'three/addons/postprocessing/UnrealBloomPass.js';
 import { OutputPass } from 'three/addons/postprocessing/OutputPass.js';
-import { T, PAL, ANTS } from './config.js?v=f511fb61';
-import { rand } from './util.js?v=f511fb61';
-import { G, head, input, view, flags } from './state.js?v=f511fb61';
+import { T, PAL, ANTS } from './config.js?v=785a1ab2';
+import { rand } from './util.js?v=785a1ab2';
+import { G, head, input, view, flags } from './state.js?v=785a1ab2';
 
 let renderer, composer, camera, videoMesh, normal, glow, top, atlasTex;
 export let atlasReady = Promise.resolve(); // иконки бонусов дорисованы в атлас (SVG грузятся асинхронно)
