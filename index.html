@@ -1,0 +1,146 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Муравьиная осада</title>
+<link rel="stylesheet" href="css/fonts.css">
+<link rel="stylesheet" href="css/style.css">
+<script type="importmap">
+{
+  "imports": {
+    "three": "./vendor/three/build/three.module.min.js",
+    "three/addons/": "./vendor/three/examples/jsm/"
+  }
+}
+</script>
+</head>
+<body>
+<video id="cam" autoplay playsinline muted></video>
+<canvas id="game"></canvas>
+
+<div id="life" hidden><i id="lifeFill"></i></div>
+<div id="power" hidden title="Суперсила"><i class="ico i-sparkles"></i><div class="track"><i id="powerFill"></i></div></div>
+<div id="countdown" hidden><div id="cdLabel"></div><div id="cdNum"></div></div>
+<div id="combo" hidden title="Серия"><i class="ico i-zap"></i> <b id="comboN">0</b> <span id="comboX"></span><div class="track"><i id="comboFill"></i></div></div>
+<div id="hud" hidden>
+  <span title="Время, с"><i class="ico i-timer"></i> <b id="sTime">0</b></span>
+  <span title="Очки"><i class="ico i-star"></i> <b id="sScore">0</b></span>
+  <span title="Раздавлено"><i class="ico i-skull"></i> <b id="sKills">0</b></span>
+  <span title="На голове"><i class="ico i-bug"></i> <b id="sAtt">0</b></span>
+  <span title="Волна"><i class="ico i-waves"></i> <b id="sWave">1</b></span>
+  <span id="fx"></span>
+</div>
+<!-- не "dbg": id становятся глобальными переменными, а MediaPipe вызывает глобальную dbg(), если она есть -->
+<div id="debugLine" hidden></div>
+<div id="toast"></div>
+<div id="warn">Не вижу лицо. Вернитесь в кадр</div>
+
+<div class="screen" id="start">
+  <div class="card">
+    <h1>Муравьиная осада</h1>
+    <p>Муравьи идут к голове со всех сторон. Держитесь дольше и набирайте очки.</p>
+    <ul>
+      <li><b>Давите</b> муравьёв кончиками пальцев. Если водить пальцем по муравью, он гибнет быстрее. Без пауз — серия, очки до ×3.</li>
+      <li>Муравей, добравшийся до головы, вцепляется и отнимает жизнь.</li>
+      <li><b>Суперсила</b> <i class="ico i-sparkles"></i> копится сама, её тратят:
+        <ul>
+          <li><b>тряска головой</b> — сбрасывает вцепившихся;</li>
+          <li><b>крик</b> — отбрасывает муравьёв, чем дольше, тем сильнее;</li>
+          <li><b>огонь</b> — раскройте ладонь, сожмите кулак, затем раскройте в сторону цели. Полный шар — вся сила, начать можно с 30%.</li>
+        </ul>
+      </li>
+      <li>С волнами приходят новые виды. В конце каждой волны — гиганты.</li>
+    </ul>
+    <div class="legend">
+      <i class="ico i-bomb"></i><span>Взрыв: 35, 60 или 85% муравьёв</span>
+      <i class="ico i-snail"></i><span>Замедление, 8 с</span>
+      <i class="ico i-heart"></i><span>+33% жизни, редко</span>
+      <i class="ico i-cross"></i><span>Аптечка: +10% жизни</span>
+      <i class="ico i-shield"></i><span>Бессмертие, 7 с</span>
+    </div>
+    <div class="opts">
+      <label>Радиус пальца <input type="range" id="optRad" min="20" max="80" step="2" value="40"> <b id="optRadV">40</b> px</label>
+      <label><input type="checkbox" id="optSnd" checked> Звук</label>
+      <label><input type="checkbox" id="optMic" checked> Крик (микрофон)</label>
+    </div>
+    <p class="hint">Камеру можно ставить сбоку. Клавиши: <b>[</b> <b>]</b> — радиус пальца, <b>M</b> — звук, <b>F</b> — полный экран, <b>D</b> — отладка.</p>
+    <!-- до конца загрузки кнопки недоступны, на «Начать» — процент (js/main.js, preload) -->
+    <button class="ghost" id="btnCalib" disabled><i class="ico i-sliders"></i> Калибровка <span id="calState"></span></button>
+    <button id="btnStart" class="loading" disabled data-label="Включить камеру и начать">Загрузка…</button>
+    <p class="hint" id="loadState" aria-live="polite"></p>
+    <div id="err"></div>
+  </div>
+</div>
+
+<div class="screen" id="over" hidden>
+  <div class="card">
+    <h2>Съели.</h2>
+    <p id="rCause"></p>
+    <div class="stat"><span>Очки</span><b id="rScore">0</b></div>
+    <div class="stat"><span>Продержались</span><b id="rTime">0 с</b></div>
+    <div class="stat"><span>Раздавлено</span><b id="rKills">0</b></div>
+    <div class="stat"><span>Волна</span><b id="rWave">1</b></div>
+    <div class="stat"><span>Лучшая серия</span><b id="rCombo">0</b></div>
+    <div class="stat" style="margin-bottom:16px"><span>Рекорд</span><b id="rBest">0</b></div>
+    <div id="shotsBox" hidden>
+      <div class="shots" id="shots"></div>
+      <button class="ghost" id="btnDlAll"><i class="ico i-download"></i> Скачать все снимки</button>
+    </div>
+    <button class="ghost" id="btnCalib2"><i class="ico i-sliders"></i> Калибровка</button>
+    <button id="btnAgain">Ещё раз</button>
+  </div>
+</div>
+
+<!-- калибровка: карточка сверху, видео с руками видно под ней -->
+<div class="screen lite" id="calib" hidden>
+  <div class="card calib">
+    <div class="cal-top"><h2>Калибровка</h2><span id="calStepN"></span></div>
+    <p id="calText"></p>
+    <div class="cal-bar"><i id="calBar"></i></div>
+    <ul id="calRes" hidden></ul>
+    <div class="cal-actions">
+      <button class="ghost" id="calAgain" hidden>Повторить</button>
+      <button class="ghost" id="calReset" hidden>Сбросить</button>
+      <button id="calDone">Отмена</button>
+    </div>
+  </div>
+</div>
+
+<!-- снимок крупно -->
+<div class="screen" id="lightbox" hidden>
+  <figure class="lb">
+    <img id="lbImg" alt="">
+    <figcaption id="lbCap"></figcaption>
+    <div class="lb-actions">
+      <button class="ghost" id="lbDl"><i class="ico i-download"></i> Скачать</button>
+      <button id="lbClose">Закрыть</button>
+    </div>
+  </figure>
+</div>
+
+
+<!-- плашка студии: слева внизу, в пару к бейджу Netlify справа -->
+<a id="studio" href="https://t.me/EAIvanov" target="_blank" rel="noopener" aria-describedby="studioTip">
+  <i class="ico i-send"></i><span>ИНФОКОМ</span>
+  <span id="studioTip" role="tooltip">Вообще мы разрабатываем веб-сервисы и внедряем Битрикс24, но так тоже можем )</span>
+</a>
+
+<script>
+  // скрипты игры не загрузились (открыто с file:// или обрыв сети) — объясняем, что не так
+  function bootFail() {
+    const e = document.getElementById('err'), b = document.getElementById('btnStart');
+    b.classList.remove('loading'); b.textContent = 'Не загрузилось';
+    e.style.display = 'block';
+    e.textContent = location.protocol === 'file:'
+      ? 'Игру нужно открывать через сервер: python -m http.server 8080 в папке игры, затем http://localhost:8080'
+      : 'Скрипты игры не загрузились. Проверьте интернет и обновите страницу.';
+  }
+  addEventListener('error', ev => {
+    const e = document.getElementById('err');
+    e.style.display = 'block'; e.textContent = 'Ошибка: ' + (ev.message || ev.error || ev);
+  });
+</script>
+<script type="module" src="js/main.js" onerror="bootFail()"></script>
+</body>
+</html>

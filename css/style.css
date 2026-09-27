@@ -1,0 +1,160 @@
+:root{
+  --bg:#08051a; --ink:#efe8ff; --mute:#a99bd0;
+  --magic:#b18cff; --magic-hi:#d7c2ff; --pink:#ff6bd5; --star:#8fe9ff;
+  --red:#ff4d5e; --orange:#ff8a1f; --amber:#ffb432; --cyan:#6fe3ff;
+  --panel:rgba(16,9,40,.66);
+  color-scheme:dark;
+}
+*{box-sizing:border-box}
+[hidden]{display:none!important}
+html,body{height:100%;margin:0;background:var(--bg);color:var(--ink);font:15px/1.4 Rubik,system-ui,sans-serif;overflow:hidden}
+
+/* видео рисует three.js как текстуру; сам элемент нужен только как источник кадров */
+#cam{position:fixed;inset:0;width:100%;height:100%;opacity:0;pointer-events:none}
+#game{position:fixed;inset:0;width:100%;height:100%;display:block}
+
+/* тонкая полоса жизни во всю ширину */
+#life{position:fixed;left:0;right:0;top:0;height:6px;background:rgba(10,5,30,.55);pointer-events:none}
+#life i{position:absolute;inset:0;background:linear-gradient(90deg,#7b4dff,#c86bff 55%,#ff6bd5);box-shadow:0 0 12px rgba(177,120,255,.8);transform-origin:left;transition:transform .12s linear,background .3s}
+#life.mid i{background:var(--orange);box-shadow:0 0 12px rgba(255,138,31,.7)}
+#life.low i{background:var(--red);box-shadow:0 0 12px rgba(255,77,94,.8)}
+#life.shield i{background:var(--cyan);box-shadow:0 0 12px rgba(111,227,255,.8)}
+
+/* компактные счётчики */
+#hud{position:fixed;left:10px;top:calc(14px + env(safe-area-inset-top,0px));display:flex;gap:10px;align-items:center;flex-wrap:wrap;padding:3px 10px;background:var(--panel);border:1px solid rgba(177,140,255,.25);border-radius:6px;backdrop-filter:blur(4px);font:600 12px/1.5 Rubik,system-ui,sans-serif;font-variant-numeric:tabular-nums;pointer-events:none}
+#hud b{color:var(--magic-hi);font-weight:600}
+.chip{padding:0 6px;border:1px solid currentColor;font-size:11px;border-radius:4px}
+.chip.slow,.chip.shield{color:var(--cyan)} .chip.fear{color:var(--pink)}
+/* небольшая шкала суперсилы вверху по центру */
+#power{position:fixed;left:50%;top:calc(12px + env(safe-area-inset-top,0px));transform:translateX(-50%);display:flex;align-items:center;gap:6px;pointer-events:none;font-size:13px;color:var(--magic-hi)}
+#power .track{width:min(220px,36vw);height:6px;border-radius:3px;background:rgba(10,5,30,.6);border:1px solid rgba(177,140,255,.35);overflow:hidden}
+#power .track i{display:block;height:100%;background:linear-gradient(90deg,#7b4dff,#ff6bd5);transform-origin:left;transition:transform .1s linear}
+#power.ready{color:var(--pink);text-shadow:0 0 8px rgba(255,107,213,.9)}
+#power.ready .track{box-shadow:0 0 12px rgba(255,107,213,.8);animation:pulse 1s ease-in-out infinite alternate}
+@keyframes pulse{from{box-shadow:0 0 4px rgba(255,107,213,.5)}to{box-shadow:0 0 14px rgba(255,107,213,1)}}
+
+/* отсчёт 3-2-1: небольшая плашка под шкалой суперсилы, игра при этом идёт */
+#countdown{position:fixed;left:50%;top:calc(34px + env(safe-area-inset-top,0px));transform:translateX(-50%);display:flex;align-items:center;gap:8px;padding:2px 12px;background:var(--panel);border:1px solid rgba(177,140,255,.35);border-radius:999px;pointer-events:none}
+#cdLabel{font:600 12px Rubik,system-ui,sans-serif;letter-spacing:.06em;color:var(--magic-hi)}
+#cdNum{display:inline-block;min-width:1ch;font:800 22px/1.2 Unbounded,sans-serif;background:linear-gradient(180deg,#f0e2ff,#ff6bd5);-webkit-background-clip:text;background-clip:text;color:transparent}
+#cdNum.pop{animation:cdpop .5s ease-out}
+@keyframes cdpop{0%{transform:scale(1.8)}100%{transform:scale(1)}}
+#debugLine{position:fixed;left:10px;bottom:calc(64px + env(safe-area-inset-bottom,0px));max-width:calc(100% - 20px);padding:4px 8px;background:var(--panel);border-radius:4px;font:12px/1.4 ui-monospace,Consolas,monospace;color:var(--magic-hi);pointer-events:none}
+
+#toast{position:fixed;left:50%;top:22%;transform:translateX(-50%);font-family:Unbounded,'Rubik Mono One',sans-serif;font-weight:800;font-size:clamp(22px,5vw,44px);color:#f0e2ff;text-shadow:0 0 18px rgba(177,100,255,.95),0 0 40px rgba(255,107,213,.5),0 2px 0 #000;opacity:0;pointer-events:none;transition:opacity .2s;text-align:center;max-width:92vw;text-wrap:balance}
+#warn{position:fixed;left:50%;bottom:calc(20px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);background:var(--panel);border:1.5px solid var(--amber);border-radius:6px;color:var(--amber);padding:6px 12px;font-size:13px;display:none;z-index:5}
+#warn.pause{top:50%;bottom:auto;transform:translate(-50%,-50%);padding:14px 22px;font-size:18px;font-weight:600;text-align:center}
+
+/* экраны меню: ровное затемнение поверх игры и мерцающие звёзды */
+/* снизу место под плашки ИНФОКОМ и Netlify, чтобы они не закрывали кнопки */
+.screen{position:fixed;inset:0;display:grid;place-items:center;padding:16px 16px 72px;overflow:auto;
+  background:rgba(6,6,10,.82);backdrop-filter:blur(6px)}
+.screen::before{content:'';position:fixed;inset:0;pointer-events:none;opacity:.8;
+  background-image:
+    radial-gradient(1.5px 1.5px at 12% 22%,#fff,transparent),radial-gradient(1px 1px at 28% 68%,#e6d9ff,transparent),
+    radial-gradient(1.5px 1.5px at 44% 14%,#fff,transparent),radial-gradient(1px 1px at 63% 82%,#fff,transparent),
+    radial-gradient(2px 2px at 78% 36%,#f3e8ff,transparent),radial-gradient(1px 1px at 88% 64%,#fff,transparent),
+    radial-gradient(1.5px 1.5px at 6% 88%,#e6d9ff,transparent),radial-gradient(1px 1px at 53% 48%,#fff,transparent),
+    radial-gradient(1px 1px at 34% 92%,#fff,transparent),radial-gradient(1.5px 1.5px at 94% 10%,#fff,transparent);
+  animation:twinkle 3.5s ease-in-out infinite alternate}
+@keyframes twinkle{from{opacity:.35}to{opacity:.9}}
+.card{position:relative;max-width:560px;width:100%;padding:26px 24px;border:1px solid rgba(177,140,255,.45);border-radius:16px;
+  background:linear-gradient(160deg,rgba(30,17,70,.94),rgba(12,7,30,.96));
+  box-shadow:inset 0 0 0 1px rgba(255,255,255,.04),0 12px 40px rgba(0,0,0,.5)}
+h1,h2{font-family:Unbounded,'Rubik Mono One',sans-serif;font-weight:800;margin:0 0 14px;text-wrap:balance;
+  background:linear-gradient(90deg,#c9a6ff,#ff8fe0 55%,#8fe9ff);-webkit-background-clip:text;background-clip:text;color:transparent}
+h1{font-size:clamp(28px,6vw,44px);line-height:1.05}
+h2{font-size:24px;line-height:1.1}
+p{margin:0 0 10px;color:var(--mute)}
+ul{margin:0 0 16px;padding-left:18px;color:var(--ink)}
+li{margin:4px 0}
+li::marker{color:var(--magic)}
+li b{color:var(--magic-hi)}
+button{font:600 16px Rubik,system-ui;padding:13px 20px;border:0;border-radius:10px;color:#fff;cursor:pointer;width:100%;
+  background:linear-gradient(135deg,#7b4dff,#c45cff 60%,#ff6bd5);box-shadow:0 6px 26px rgba(160,90,255,.5)}
+button:hover{filter:brightness(1.12)}
+button:focus-visible{outline:3px solid var(--star);outline-offset:2px}
+button:disabled{opacity:.6;cursor:wait}
+/* загрузка: кнопка «Начать» заполняется слева по мере загрузки */
+button.loading,button.loading:disabled{opacity:1;box-shadow:none;font-variant-numeric:tabular-nums;
+  background:linear-gradient(90deg,#7b4dff,#c45cff calc(var(--p,0) * 100%),rgba(123,77,255,.22) 0)}
+.stat{display:flex;justify-content:space-between;border-bottom:1px dashed rgba(177,140,255,.25);padding:6px 0;font-variant-numeric:tabular-nums}
+.stat b{font-family:Unbounded,sans-serif;font-weight:700;color:var(--magic-hi)}
+#err{color:var(--red);margin-top:10px;display:none;white-space:pre-wrap}
+#loadState{margin:8px 0 0;text-align:center;font-variant-numeric:tabular-nums}
+#loadState:empty{display:none}
+.legend{display:grid;grid-template-columns:auto 1fr;gap:6px 10px;align-items:center;font-size:13px;margin-bottom:16px}
+.legend .ico{width:18px;height:18px;color:var(--magic-hi)}
+.legend .i-cross{color:#2fd46f}
+ul ul{margin:4px 0 0;padding-left:16px}
+
+/* иконки Lucide (icons/, лицензия ISC): SVG задаёт форму, цвет — от текста */
+.ico{display:inline-block;width:1.15em;height:1.15em;vertical-align:-0.22em;background:currentColor;
+  -webkit-mask:var(--i) center/contain no-repeat;mask:var(--i) center/contain no-repeat}
+.i-timer{--i:url(../icons/timer.svg)} .i-star{--i:url(../icons/star.svg)} .i-skull{--i:url(../icons/skull.svg)}
+.i-bug{--i:url(../icons/bug.svg)} .i-waves{--i:url(../icons/waves.svg)} .i-sparkles{--i:url(../icons/sparkles.svg)}
+.i-bomb{--i:url(../icons/bomb.svg)} .i-snail{--i:url(../icons/snail.svg)} .i-heart{--i:url(../icons/heart.svg)}
+.i-shield{--i:url(../icons/shield.svg)} .i-download{--i:url(../icons/download.svg)} .i-rotate{--i:url(../icons/rotate-ccw.svg)}
+.i-x{--i:url(../icons/x.svg)} .i-send{--i:url(../icons/send.svg)} .i-cross{--i:url(../icons/cross.svg)} .i-zap{--i:url(../icons/zap.svg)} .i-sliders{--i:url(../icons/sliders-horizontal.svg)}
+#calState{font-weight:400;color:var(--mute)}
+
+/* серия: справа вверху, полоска — сколько осталось до обрыва */
+#combo{position:fixed;right:10px;top:calc(14px + env(safe-area-inset-top,0px));display:grid;grid-template-columns:auto auto auto;gap:0 6px;align-items:center;padding:3px 10px 5px;background:var(--panel);border:1px solid rgba(177,140,255,.25);border-radius:6px;font:600 12px/1.5 Rubik,system-ui,sans-serif;font-variant-numeric:tabular-nums;color:var(--magic-hi);pointer-events:none}
+#combo b{font:800 16px/1.2 Unbounded,sans-serif}
+#comboX{color:var(--pink)}
+#combo .track{grid-column:1/-1;height:3px;border-radius:2px;background:rgba(10,5,30,.6);overflow:hidden}
+#combo .track i{display:block;height:100%;background:var(--magic);transform-origin:left}
+#combo.t1 b{color:var(--magic)} #combo.t2 b{color:var(--pink)} #combo.t3 b{color:var(--amber)}
+#combo.t3{border-color:var(--amber);box-shadow:0 0 12px rgba(255,180,50,.5)}
+.chip.lull{color:var(--magic-hi)}
+
+/* калибровка: экран без затемнения, карточка сверху — под ней видно себя и руки */
+.screen.lite{background:none;backdrop-filter:none;place-items:start center}
+.screen.lite::before{display:none}
+.card.calib{max-width:460px;padding:16px 20px;background:linear-gradient(160deg,rgba(30,17,70,.88),rgba(12,7,30,.9))}
+.cal-top{display:flex;justify-content:space-between;align-items:baseline;gap:10px}
+.cal-top h2{margin:0 0 8px;font-size:18px}
+#calStepN{color:var(--mute);font-variant-numeric:tabular-nums}
+#calText{font:700 20px/1.3 Rubik,system-ui,sans-serif;color:var(--ink);margin-bottom:10px;min-height:1.3em}
+.cal-bar{height:6px;border-radius:3px;background:rgba(10,5,30,.6);border:1px solid rgba(177,140,255,.35);overflow:hidden;margin-bottom:12px}
+.cal-bar i{display:block;height:100%;background:linear-gradient(90deg,#7b4dff,#ff6bd5);transform-origin:left;transform:scaleX(0)}
+#calRes{font-size:13px;margin-bottom:12px}
+.cal-actions{display:flex;gap:10px}
+.cal-actions button{margin:0;padding:10px 14px}
+#hud .ico{color:var(--magic-hi)}
+.opts{display:flex;flex-wrap:wrap;gap:10px 22px;align-items:center;margin-bottom:10px;font-size:13px}
+.opts input[type=range]{accent-color:var(--magic);vertical-align:middle;width:140px}
+.opts input[type=checkbox]{accent-color:var(--magic);vertical-align:middle}
+.opts b{color:var(--magic-hi);font-variant-numeric:tabular-nums}
+.hint{font-size:12px}
+.hint b{color:var(--magic-hi)}
+/* галерея снимков на экране результата: карточка шире, превью крупные */
+.card.wide{max-width:min(920px,100%)}
+.shots{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:10px}
+.shots .shot{padding:0;width:auto;background:none;border:1px solid rgba(177,140,255,.35);border-radius:10px;overflow:hidden;box-shadow:none;display:flex;flex-direction:column;cursor:zoom-in}
+.shots .shot img{display:block;width:100%;aspect-ratio:16/10;object-fit:cover}
+.shots .shot span{font:600 12px/1.3 Rubik,system-ui,sans-serif;color:var(--magic-hi);padding:5px 8px;text-align:left;background:rgba(16,9,40,.8)}
+@media (max-width:560px){.shots{grid-template-columns:repeat(2,1fr)}}
+button.ghost{background:transparent;border:1px solid rgba(177,140,255,.6);color:var(--magic-hi);box-shadow:none;margin-bottom:12px}
+/* снимок крупно — почти на весь экран */
+.lb{margin:0;width:100%;display:grid;gap:10px;justify-items:center}
+.lb img{width:min(1280px,94vw);height:auto;max-height:80vh;object-fit:contain;border-radius:12px;border:1px solid rgba(177,140,255,.45);box-shadow:0 0 60px rgba(140,90,255,.35)}
+.lb figcaption{color:var(--magic-hi);font:600 15px Rubik,system-ui,sans-serif}
+.lb-actions{display:flex;gap:12px}
+.lb-actions button{width:auto;min-width:180px;margin:0}
+
+@media (prefers-reduced-motion:reduce){#life i{transition:none}.screen::before{animation:none}#cdNum.pop,#power.ready .track{animation:none}}
+
+/* плашка студии: размер и отступы как у бейджа Netlify справа, стиль свой — тёмная, с градиентной рамкой */
+#studio{position:fixed;left:10px;bottom:calc(18px + env(safe-area-inset-bottom,0px));z-index:20;height:36px;min-width:180px;padding:0 14px;
+  display:flex;align-items:center;justify-content:center;gap:8px;border-radius:8px;text-decoration:none;color:#f0e2ff;
+  font:800 13px/1 Unbounded,sans-serif;letter-spacing:.14em;
+  background:linear-gradient(#0d0a18,#0d0a18) padding-box,linear-gradient(135deg,#7b4dff,#ff6bd5) border-box;border:1.5px solid transparent;
+  box-shadow:0 4px 14px rgba(0,0,0,.45);transition:transform .15s,box-shadow .15s}
+#studio .ico{width:15px;height:15px;color:var(--pink)}
+#studio:hover,#studio:focus-visible{transform:translateY(-1px);box-shadow:0 6px 18px rgba(255,107,213,.35);outline:none}
+#studioTip{position:absolute;left:0;bottom:calc(100% + 10px);width:max-content;max-width:min(280px,80vw);padding:8px 12px;border-radius:8px;
+  background:#0d0a18;border:1px solid rgba(177,140,255,.5);box-shadow:0 8px 24px rgba(0,0,0,.5);
+  font:400 13px/1.4 Rubik,system-ui,sans-serif;letter-spacing:0;color:var(--ink);text-wrap:balance;
+  opacity:0;transform:translateY(4px);pointer-events:none;transition:opacity .15s,transform .15s}
+#studio:hover #studioTip,#studio:focus-visible #studioTip{opacity:1;transform:none}
