@@ -1,5 +1,5 @@
 // Общее изменяемое состояние. Модули — синглтоны, так что все видят одни и те же объекты.
-import { rand } from './util.js';
+import { rand } from './util.js?v=f511fb61';
 
 // экран и пересчёт координат камеры
 export const view = { W: 0, H: 0, vw: 0, vh: 0, scale: 1, offX: 0, offY: 0 };

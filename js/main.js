@@ -1,13 +1,13 @@
 // Точка входа: интерфейс, настройки, полный экран, игровой цикл
-import { T, ANTS } from './config.js';
-import { sfx } from './audio.js';
-import { G, head, view, input, flags, resetGame, score } from './state.js';
-import { loadVision, initCamera, visionReady, fitView, track, light } from './tracking.js';
-import { step, stepParticles, stepFeel, hooks, chargeLevel, waveCountdown, comboMult } from './game.js';
-import { initCalib, openCalib, updateCalib, loadCalib, isCalibrated } from './calib.js';
-import { initRenderer, resizeRenderer, render, atlasReady } from './render.js';
-import { mic, initMic, sampleMic } from './mic.js';
-import { resetShots, requestShot, captureDue, shots, downloadShot, downloadAll } from './shots.js';
+import { T, ANTS } from './config.js?v=f511fb61';
+import { sfx } from './audio.js?v=f511fb61';
+import { G, head, view, input, flags, resetGame, score } from './state.js?v=f511fb61';
+import { loadVision, initCamera, visionReady, fitView, track, light } from './tracking.js?v=f511fb61';
+import { step, stepParticles, stepFeel, hooks, chargeLevel, waveCountdown, comboMult } from './game.js?v=f511fb61';
+import { initCalib, openCalib, updateCalib, loadCalib, isCalibrated } from './calib.js?v=f511fb61';
+import { initRenderer, resizeRenderer, render, atlasReady } from './render.js?v=f511fb61';
+import { mic, initMic, sampleMic } from './mic.js?v=f511fb61';
+import { resetShots, requestShot, captureDue, shots, downloadShot, downloadAll } from './shots.js?v=f511fb61';
 
 const $ = s => document.querySelector(s);
 const video = $('#cam'), canvas = $('#game');

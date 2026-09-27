@@ -1,9 +1,9 @@
 // Игровая логика: муравьи, суперсила, бонусы, жизнь. Ничего не рисует.
-import { T, PTS, BONUS, PAL, ANTS } from './config.js';
-import { rand, pick, dist, clamp } from './util.js';
-import { G, head, input, view } from './state.js';
-import { sfx } from './audio.js';
-import { mic } from './mic.js';
+import { T, PTS, BONUS, PAL, ANTS } from './config.js?v=f511fb61';
+import { rand, pick, dist, clamp } from './util.js?v=f511fb61';
+import { G, head, input, view } from './state.js?v=f511fb61';
+import { sfx } from './audio.js?v=f511fb61';
+import { mic } from './mic.js?v=f511fb61';
 
 // UI подставляет свои функции: надпись (текст, важность 1..3: важная не перебивается менее важной)
 // и снимок яркого момента (подпись, через сколько секунд снять)

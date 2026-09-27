@@ -1,9 +1,9 @@
 // Камера и MediaPipe: лицо (позиция, тряска, глаза) и руки (точки, скорость ладони)
 // MediaPipe 1.0.1 — локальная копия (tools/vendor.py): с чужих серверов ничего не грузится, статистика в Google отключена
 import { FilesetResolver, FaceLandmarker, HandLandmarker } from "../vendor/mediapipe/vision_bundle.mjs";
-import { T } from './config.js';
-import { clamp, dist, avg } from './util.js';
-import { view, head, input } from './state.js';
+import { T } from './config.js?v=f511fb61';
+import { clamp, dist, avg } from './util.js?v=f511fb61';
+import { view, head, input } from './state.js?v=f511fb61';
 
 // полные адреса от этого модуля (относительный путь MediaPipe понял бы от страницы)
 const WASM = new URL("../vendor/mediapipe/wasm", import.meta.url).href;
