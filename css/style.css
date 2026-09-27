@@ -90,12 +90,9 @@ ul ul{margin:4px 0 0;padding-left:16px}
 
 /* иконки Lucide (icons/, лицензия ISC): SVG задаёт форму, цвет — от текста */
 .ico{display:inline-block;width:1.15em;height:1.15em;vertical-align:-0.22em;background:currentColor;
-  -webkit-mask:var(--i) center/contain no-repeat;mask:var(--i) center/contain no-repeat}
-.i-timer{--i:url(../icons/timer.svg)} .i-star{--i:url(../icons/star.svg)} .i-skull{--i:url(../icons/skull.svg)}
-.i-bug{--i:url(../icons/bug.svg)} .i-waves{--i:url(../icons/waves.svg)} .i-sparkles{--i:url(../icons/sparkles.svg)}
-.i-bomb{--i:url(../icons/bomb.svg)} .i-snail{--i:url(../icons/snail.svg)} .i-heart{--i:url(../icons/heart.svg)}
-.i-shield{--i:url(../icons/shield.svg)} .i-download{--i:url(../icons/download.svg)} .i-rotate{--i:url(../icons/rotate-ccw.svg)}
-.i-x{--i:url(../icons/x.svg)} .i-send{--i:url(../icons/send.svg)} .i-cross{--i:url(../icons/cross.svg)} .i-zap{--i:url(../icons/zap.svg)} .i-sliders{--i:url(../icons/sliders-horizontal.svg)}
+  -webkit-mask-position:center;mask-position:center;-webkit-mask-size:contain;mask-size:contain;
+  -webkit-mask-repeat:no-repeat;mask-repeat:no-repeat}
+/* сами формы .i-* — в css/icons.css (встроены, без запросов; собирает tools/icons.py) */
 #calState{font-weight:400;color:var(--mute)}
 
 /* серия: справа вверху, полоска — сколько осталось до обрыва */

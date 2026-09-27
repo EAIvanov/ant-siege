@@ -87,7 +87,7 @@ addEventListener('keydown', e => {
 
 // ---------- загрузка всего нужного до старта: процент на кнопке, кнопки доступны, когда всё готово ----------
 // Код игры и three.js к этому моменту уже загружены (иначе main.js не запустился бы). Дальше ждём распознавание
-// (основной вес, ~12 МБ), шрифты и иконки: иконки HUD браузер сам запросил бы только при показе, в разгар игры
+// (основной вес, ~12 МБ), шрифты и иконки бонусов
 function preload() {
   const btns = [ui.btnStart, ui.btnCalib], label = ui.btnStart.dataset.label; // в разметке сейчас «Загрузка…»
   let rec = 0, fonts = 0, icons = 0;
@@ -96,17 +96,11 @@ function preload() {
     ui.btnStart.style.setProperty('--p', p);
     ui.btnStart.textContent = `Загрузка ${Math.round(p * 100)}%`;
   };
-  // адреса иконок из стилей: --i: url(...) относительно файла стилей
-  const iconUrls = [...document.styleSheets].flatMap(sh => {
-    let rules = []; try { rules = [...sh.cssRules]; } catch {}
-    return rules.map(r => r.style?.getPropertyValue('--i').match(/url\(["']?([^"')]+)/)?.[1])
-      .filter(Boolean).map(u => new URL(u, sh.href || location.href).href);
-  });
   ui.btnStart.classList.add('loading'); show();
   Promise.all([
     loadVision(p => { rec = p; show(); }),
     document.fonts.ready.then(() => { fonts = 1; show(); }),
-    Promise.all([atlasReady, ...[...new Set(iconUrls)].map(u => fetch(u))]).then(() => { icons = 1; show(); }),
+    atlasReady.then(() => { icons = 1; show(); }), // иконки бонусов в атласе; иконки интерфейса встроены в css/icons.css
   ]).then(() => { ui.load.textContent = ''; },
     e => { ui.load.textContent = `Не всё загрузилось (${e.message || e}). Нажмите «Начать», чтобы попробовать снова.`; })
     .finally(() => {
